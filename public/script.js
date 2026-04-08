@@ -1,22 +1,18 @@
 // NASA APOD BACKGROUND
-async function loadAPOD() {
+async function loadBackdrop() {
   try {
-    const res = await fetch('/apod');
-    const data = await res.json();
-    if (data.mediaType === 'image' && data.url) {
-      const img = new Image();
-      img.onload = () => {
-        document.body.style.setProperty('--apod-url', `url('${data.url}')`);
-        document.getElementById('apod-bg').style.backgroundImage = `url('${data.url}')`;
-        document.getElementById('apod-bg').style.opacity = '0.25';
-      };
-      img.src = data.url;
-    }
+    const img = new Image();
+    img.onload = () => {
+      document.getElementById('apod-bg').style.backgroundImage = `url('/backdrop')`;
+      document.getElementById('apod-bg').style.opacity = '0.25';
+    };
+    img.onerror = () => console.log('Backdrop failed to load');
+    img.src = '/backdrop';
   } catch (err) {
-    console.log('APOD unavailable, stars only.');
+    console.log('Backdrop unavailable.');
   }
 }
-loadAPOD();
+loadBackdrop();
 
 // STARS CANVAS
 const canvas = document.getElementById('stars');
