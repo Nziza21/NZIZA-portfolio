@@ -4,6 +4,7 @@ const ctx = canvas.getContext('2d');
 
 let stars = [];
 let shootingStars = [];
+let mouse = { x: null, y: null };
 const NUM_STARS = 250;
 
 function resize() {
@@ -22,6 +23,7 @@ function createStars() {
       speed: Math.random() * 0.004 + 0.001,
       drift: (Math.random() - 0.5) * 0.12,
       color: Math.random() > 0.8 ? '201, 168, 76' : '255, 255, 255',
+      ox: 0, oy: 0,
     });
   }
 }
@@ -47,8 +49,19 @@ function drawStars() {
     if (s.x > canvas.width) s.x = 0;
     if (s.x < 0) s.x = canvas.width;
 
+    let dx = 0, dy = 0;
+    if (mouse.x !== null) {
+      const distX = s.x - mouse.x;
+      const distY = s.y - mouse.y;
+      const dist = Math.sqrt(distX * distX + distY * distY);
+      if (dist < 120) {
+        dx = (distX / dist) * (120 - dist) * 0.03;
+        dy = (distY / dist) * (120 - dist) * 0.03;
+      }
+    }
+
     ctx.beginPath();
-    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.arc(s.x + dx, s.y + dy, s.r, 0, Math.PI * 2);
     ctx.fillStyle = `rgba(${s.color}, ${s.alpha * 0.9})`;
     ctx.fill();
   });
@@ -56,7 +69,10 @@ function drawStars() {
   shootingStars.forEach((ss, i) => {
     ctx.beginPath();
     ctx.moveTo(ss.x, ss.y);
-    ctx.lineTo(ss.x - Math.cos(ss.angle) * ss.len, ss.y - Math.sin(ss.angle) * ss.len);
+    ctx.lineTo(
+      ss.x - Math.cos(ss.angle) * ss.len,
+      ss.y - Math.sin(ss.angle) * ss.len
+    );
     const grad = ctx.createLinearGradient(
       ss.x, ss.y,
       ss.x - Math.cos(ss.angle) * ss.len,
@@ -78,6 +94,16 @@ function drawStars() {
   requestAnimationFrame(drawStars);
 }
 
+window.addEventListener('mousemove', e => {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+});
+
+window.addEventListener('mouseleave', () => {
+  mouse.x = null;
+  mouse.y = null;
+});
+
 resize();
 createStars();
 drawStars();
@@ -87,6 +113,43 @@ setInterval(() => {
 }, 2000);
 
 window.addEventListener('resize', () => { resize(); createStars(); });
+
+// TYPING ANIMATION
+const typingEl = document.getElementById('typing-text');
+const phrases = [
+  'Full-Stack Software Engineer',
+  'Frontend Developer',
+  'Backend Engineer',
+  'Go & Python Developer',
+  'React Specialist',
+];
+let phraseIndex = 0;
+let charIndex = 0;
+let isDeleting = false;
+
+function type() {
+  const current = phrases[phraseIndex];
+  if (isDeleting) {
+    typingEl.textContent = current.substring(0, charIndex--);
+  } else {
+    typingEl.textContent = current.substring(0, charIndex++);
+  }
+
+  if (!isDeleting && charIndex === current.length + 1) {
+    isDeleting = true;
+    setTimeout(type, 1800);
+    return;
+  }
+
+  if (isDeleting && charIndex === 0) {
+    isDeleting = false;
+    phraseIndex = (phraseIndex + 1) % phrases.length;
+  }
+
+  setTimeout(type, isDeleting ? 50 : 90);
+}
+
+if (typingEl) type();
 
 // NAVBAR SCROLL
 const navbar = document.getElementById('navbar');
@@ -118,21 +181,40 @@ document.querySelectorAll('.nav-links a').forEach(link => {
 });
 
 // SCROLL REVEAL
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
     if (entry.isIntersecting) {
-      entry.target.style.opacity = '1';
-      entry.target.style.transform = 'translateY(0)';
+      setTimeout(() => {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }, i * 100);
     }
   });
 }, { threshold: 0.1 });
 
-document.querySelectorAll('.project-card, .skill-card, .about-grid, .roles-list li').forEach(el => {
+document.querySelectorAll('.project-card, .skill-card, .roles-list li, .about-text p, .stat').forEach(el => {
   el.style.opacity = '0';
   el.style.transform = 'translateY(30px)';
   el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-  observer.observe(el);
+  revealObserver.observe(el);
 });
+
+// SKILL PROGRESS BARS
+const skillBars = document.querySelectorAll('.skill-progress');
+const barObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const bar = entry.target;
+      const target = bar.getAttribute('data-width');
+      setTimeout(() => {
+        bar.style.width = target + '%';
+      }, 200);
+      barObserver.unobserve(bar);
+    }
+  });
+}, { threshold: 0.3 });
+
+skillBars.forEach(bar => barObserver.observe(bar));
 
 // CONTACT FORM
 const form = document.getElementById('contact-form');
