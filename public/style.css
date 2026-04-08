@@ -20,7 +20,6 @@ body {
   overflow-x: hidden;
 }
 
-/* CANVAS */
 #stars {
   position: fixed;
   top: 0; left: 0;
@@ -29,7 +28,6 @@ body {
   pointer-events: none;
 }
 
-/* NAV */
 #navbar {
   position: fixed;
   top: 0; left: 0; right: 0;
@@ -87,7 +85,6 @@ body {
   transition: all 0.3s;
 }
 
-/* HERO */
 .hero {
   position: relative;
   z-index: 1;
@@ -208,7 +205,6 @@ body {
   100% { opacity: 0; transform: scaleY(1); transform-origin: bottom; }
 }
 
-/* SECTIONS */
 .section {
   position: relative;
   z-index: 1;
@@ -241,7 +237,6 @@ body {
   margin: 1rem auto 0;
 }
 
-/* ABOUT */
 .about-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -301,10 +296,8 @@ body {
 }
 
 .roles-list li:hover { color: var(--gold); }
-
 .roles-list li i { color: var(--gold); width: 16px; font-size: 0.85rem; }
 
-/* SKILLS */
 .skills-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -330,10 +323,7 @@ body {
   transform: translateY(-4px);
 }
 
-.skill-card i {
-  font-size: 1.8rem;
-  color: var(--gold);
-}
+.skill-card i { font-size: 1.8rem; color: var(--gold); }
 
 .skill-card span {
   font-size: 0.75rem;
@@ -342,7 +332,6 @@ body {
   color: var(--text-muted);
 }
 
-/* PROJECTS */
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -411,7 +400,6 @@ body {
   border-radius: 2px;
 }
 
-/* CONTACT */
 .contact-sub {
   text-align: center;
   color: var(--text-muted);
@@ -478,7 +466,6 @@ body {
   min-height: 1.2rem;
 }
 
-/* FOOTER */
 footer {
   position: relative;
   z-index: 1;
@@ -493,7 +480,6 @@ footer {
 footer span { color: var(--gold); }
 footer a { color: var(--gold); text-decoration: none; }
 
-/* RESPONSIVE */
 @media (max-width: 768px) {
   #navbar { padding: 1.2rem 1.5rem; }
   .nav-links { display: none; }
@@ -501,17 +487,4 @@ footer a { color: var(--gold); text-decoration: none; }
   .about-grid { grid-template-columns: 1fr; gap: 2rem; }
   .contact-wrapper { grid-template-columns: 1fr; gap: 2rem; }
   .about-stats { gap: 1rem; }
-}
-
-#apod-bg {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  z-index: 0;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  opacity: 0;
-  transition: opacity 2s ease;
-  filter: grayscale(20%) brightness(0.4);
 }
