@@ -1,25 +1,10 @@
-// NASA APOD BACKGROUND
-async function loadBackdrop() {
-  try {
-    const img = new Image();
-    img.onload = () => {
-      document.getElementById('apod-bg').style.backgroundImage = `url('/backdrop')`;
-      document.getElementById('apod-bg').style.opacity = '0.25';
-    };
-    img.onerror = () => console.log('Backdrop failed to load');
-    img.src = '/backdrop';
-  } catch (err) {
-    console.log('Backdrop unavailable.');
-  }
-}
-loadBackdrop();
-
 // STARS CANVAS
 const canvas = document.getElementById('stars');
 const ctx = canvas.getContext('2d');
 
 let stars = [];
-const NUM_STARS = 180;
+let shootingStars = [];
+const NUM_STARS = 250;
 
 function resize() {
   canvas.width = window.innerWidth;
@@ -32,16 +17,29 @@ function createStars() {
     stars.push({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
-      r: Math.random() * 1.2 + 0.2,
+      r: Math.random() * 1.5 + 0.2,
       alpha: Math.random(),
-      speed: Math.random() * 0.003 + 0.001,
-      drift: (Math.random() - 0.5) * 0.15,
+      speed: Math.random() * 0.004 + 0.001,
+      drift: (Math.random() - 0.5) * 0.12,
+      color: Math.random() > 0.8 ? '201, 168, 76' : '255, 255, 255',
     });
   }
 }
 
+function addShootingStar() {
+  shootingStars.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height * 0.5,
+    len: Math.random() * 120 + 80,
+    speed: Math.random() * 8 + 6,
+    alpha: 1,
+    angle: Math.PI / 5,
+  });
+}
+
 function drawStars() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
   stars.forEach(s => {
     s.alpha += s.speed;
     if (s.alpha > 1 || s.alpha < 0) s.speed *= -1;
@@ -51,15 +49,43 @@ function drawStars() {
 
     ctx.beginPath();
     ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(201, 168, 76, ${s.alpha * 0.8})`;
+    ctx.fillStyle = `rgba(${s.color}, ${s.alpha * 0.9})`;
     ctx.fill();
   });
+
+  shootingStars.forEach((ss, i) => {
+    ctx.beginPath();
+    ctx.moveTo(ss.x, ss.y);
+    ctx.lineTo(ss.x - Math.cos(ss.angle) * ss.len, ss.y - Math.sin(ss.angle) * ss.len);
+    const grad = ctx.createLinearGradient(
+      ss.x, ss.y,
+      ss.x - Math.cos(ss.angle) * ss.len,
+      ss.y - Math.sin(ss.angle) * ss.len
+    );
+    grad.addColorStop(0, `rgba(201, 168, 76, ${ss.alpha})`);
+    grad.addColorStop(1, 'rgba(201, 168, 76, 0)');
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ss.x += Math.cos(ss.angle) * ss.speed;
+    ss.y += Math.sin(ss.angle) * ss.speed;
+    ss.alpha -= 0.02;
+
+    if (ss.alpha <= 0) shootingStars.splice(i, 1);
+  });
+
   requestAnimationFrame(drawStars);
 }
 
 resize();
 createStars();
 drawStars();
+
+setInterval(() => {
+  if (Math.random() > 0.6) addShootingStar();
+}, 2000);
+
 window.addEventListener('resize', () => { resize(); createStars(); });
 
 // NAVBAR SCROLL
