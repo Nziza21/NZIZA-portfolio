@@ -1,4 +1,3 @@
-// STARS CANVAS
 const canvas = document.getElementById('stars');
 const ctx = canvas.getContext('2d');
 
