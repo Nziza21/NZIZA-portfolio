@@ -8,7 +8,7 @@ async function loadAPOD() {
       img.onload = () => {
         document.body.style.setProperty('--apod-url', `url('${data.url}')`);
         document.getElementById('apod-bg').style.backgroundImage = `url('${data.url}')`;
-        document.getElementById('apod-bg').style.opacity = '0.18';
+        document.getElementById('apod-bg').style.opacity = '0.25';
       };
       img.src = data.url;
     }

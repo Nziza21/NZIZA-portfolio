@@ -64,13 +64,29 @@ app.post('/send', async (req, res) => {
   }
 });
 
-app.get('/apod', async (req, res) => {
+app.get('/backdrop', async (req, res) => {
   try {
-    const response = await fetch(`https://api.nasa.gov/planetary/apod?api_key=${process.env.NASA_API_KEY}`);
+    const response = await fetch('https://api.themoviedb.org/3/movie/popular?language=en-US&page=1', {
+      headers: {
+        Authorization: `Bearer ${process.env.TMDB_TOKEN}`,
+        'Content-Type': 'application/json',
+      }
+    });
     const data = await response.json();
-    res.json({ url: data.hdurl || data.url, mediaType: data.media_type });
+    const movies = data.results.filter(m => m.backdrop_path);
+    const random = movies[Math.floor(Math.random() * movies.length)];
+    const imageUrl = `https://image.tmdb.org/t/p/original${random.backdrop_path}`;
+
+    const imgRes = await fetch(imageUrl);
+    const contentType = imgRes.headers.get('content-type') || 'image/jpeg';
+    const buffer = await imgRes.buffer();
+
+    res.set('Content-Type', contentType);
+    res.set('Cache-Control', 'public, max-age=3600');
+    res.send(buffer);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch APOD' });
+    console.error('TMDB error:', err);
+    res.status(500).json({ error: err.message });
   }
 });
 
