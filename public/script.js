@@ -1,3 +1,23 @@
+// NASA APOD BACKGROUND
+async function loadAPOD() {
+  try {
+    const res = await fetch('/apod');
+    const data = await res.json();
+    if (data.mediaType === 'image' && data.url) {
+      const img = new Image();
+      img.onload = () => {
+        document.body.style.setProperty('--apod-url', `url('${data.url}')`);
+        document.getElementById('apod-bg').style.backgroundImage = `url('${data.url}')`;
+        document.getElementById('apod-bg').style.opacity = '0.18';
+      };
+      img.src = data.url;
+    }
+  } catch (err) {
+    console.log('APOD unavailable, stars only.');
+  }
+}
+loadAPOD();
+
 // STARS CANVAS
 const canvas = document.getElementById('stars');
 const ctx = canvas.getContext('2d');
@@ -67,7 +87,6 @@ hamburger.addEventListener('click', () => {
   navLinks.style.gap = '1.5rem';
 });
 
-// SMOOTH CLOSE NAV ON LINK CLICK
 document.querySelectorAll('.nav-links a').forEach(link => {
   link.addEventListener('click', () => {
     if (window.innerWidth <= 768) {
@@ -95,7 +114,7 @@ document.querySelectorAll('.project-card, .skill-card, .about-grid, .roles-list 
 
 // CONTACT FORM
 const form = document.getElementById('contact-form');
-const status = document.getElementById('form-status');
+const formStatus = document.getElementById('form-status');
 const sendBtn = document.getElementById('send-btn');
 const btnText = document.getElementById('btn-text');
 
@@ -107,14 +126,14 @@ form.addEventListener('submit', async (e) => {
   const message = document.getElementById('message').value.trim();
 
   if (!name || !email || !message) {
-    status.style.color = '#e74c3c';
-    status.textContent = 'Please fill in all fields.';
+    formStatus.style.color = '#e74c3c';
+    formStatus.textContent = 'Please fill in all fields.';
     return;
   }
 
   btnText.textContent = 'Sending...';
   sendBtn.disabled = true;
-  status.textContent = '';
+  formStatus.textContent = '';
 
   try {
     const res = await fetch('/send', {
@@ -126,16 +145,16 @@ form.addEventListener('submit', async (e) => {
     const data = await res.json();
 
     if (data.success) {
-      status.style.color = '#c9a84c';
-      status.textContent = 'Message sent! I\'ll get back to you soon.';
+      formStatus.style.color = '#c9a84c';
+      formStatus.textContent = "Message sent! I'll get back to you soon.";
       form.reset();
     } else {
-      status.style.color = '#e74c3c';
-      status.textContent = data.error || 'Something went wrong. Try again.';
+      formStatus.style.color = '#e74c3c';
+      formStatus.textContent = data.error || 'Something went wrong. Try again.';
     }
   } catch (err) {
-    status.style.color = '#e74c3c';
-    status.textContent = 'Network error. Please try again.';
+    formStatus.style.color = '#e74c3c';
+    formStatus.textContent = 'Network error. Please try again.';
   } finally {
     btnText.textContent = 'Send Message';
     sendBtn.disabled = false;
